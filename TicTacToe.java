@@ -1,8 +1,8 @@
 /**
 * This class models the Tic Tac Toe game.
 * @author Daniel K Nguyen, Sunghyun Nam, Callie Nicole Marshall
-* @version 1.0
-* @since 2/28/2022
+* @version 1.1
+* @since 3/1/2022
 */
 
 import java.util.Scanner;
@@ -13,12 +13,24 @@ public class TicTacToe{
 		char[][] board = {{' ', ' ', ' '}, {' ', ' ', ' '}, {' ', ' ', ' '}}; // Create a 3 by 3 board
 		char playerSymbol = 'X'; // Player uses X in the game. 
 		char opponentSymbol = 'O'; // Opponent uses O in the game.
-		
 		printBoard(board); // Print out the empty board using the printBoard method.
 		
-		playerTurn(board, playerSymbol); // Player(user) makes a choice using the plyaerTurn method.
-		opponentTurn(board, opponentSymbol); // Opponent(computer) makes a choice using the opponentTurn method.
-		printBoard(board); // Print out the board filled by player and opponent.
+		while(true){
+			playerTurn(board, playerSymbol); // Player(user) makes a choice using the plyaerTurn method.
+			if(winCondition(board, playerSymbol)){ //if player has won, win message will display before opponent's turn
+				System.out.println("You won");
+				break;
+			}			
+			opponentTurn(board, opponentSymbol); // Opponent(computer) makes a choice using the opponentTurn method.
+			if(loseCondition(board, opponentSymbol)){ //if oppponent has won, lose message will display
+				System.out.println("You lose");
+				printBoard(board); //prints state of board with winning move
+				break;
+			}
+			else{
+				printBoard(board); // Print out the board filled by player and opponent.
+			}
+		}
 	}
 
 	/**
@@ -62,7 +74,7 @@ public class TicTacToe{
 	private static void opponentTurn(char[][] board, char symbol){
 		int opponentChoice;
 		while(true){
-			opponentChoice = (int)(Math.random()*8 + 1); // Use Math.random method.
+			opponentChoice = (int)(Math.random()*9 + 1); // Use Math.random method, 0-8 then 1-9
 		    if(validMove(opponentChoice, board)){ // Check whether the opponent's choice is valid (empty) using the validMove method.
 				break;
 			}
@@ -109,5 +121,91 @@ public class TicTacToe{
 			case 9: return(board[2][2] == ' ');
 			default: return false;
 		}
+	}
+	
+	/**
+	* Checks whether you have won with three in a row
+	* @param array of char. Coordinates for the board.
+	* @param char of symbol. Symbol for player
+	* @return true or false whether the player has won
+	*/
+	private static boolean winCondition(char[][] board, char symbol){
+		//top row filled in
+		if(board[0][0] == symbol && board[0][1] == symbol && board[0][2] == symbol){
+			return true;
+		}
+		//left column filled in
+		else if(board[0][0] == symbol && board[1][0] == symbol && board[2][0] == symbol){
+			return true;
+		}
+		//backslash diagonal filled in
+		else if(board[0][0] == symbol && board[1][1] == symbol && board[2][2] == symbol){
+			return true;
+		}
+		//forward slash diagonal filled in
+		else if(board[0][2] == symbol && board[1][1] == symbol && board[2][0] == symbol){
+			return true;
+		}
+		//middle column filled in
+		else if(board[0][1] == symbol && board[1][1] == symbol && board[2][1] == symbol){
+			return true;
+		}
+		//right column filled in
+		else if(board[0][2] == symbol && board[1][2] == symbol && board[2][2] == symbol){
+			return true;
+		}
+		//middle row filled in
+		else if(board[1][0] == symbol && board[1][1] == symbol && board[1][2] == symbol){
+			return true;
+		}
+		//bottom row filled in
+		else if(board[2][0] == symbol && board[2][1] == symbol && board[2][2] == symbol){
+			return true;
+		}
+		//otherwise return false
+		return false;
+	}
+
+	/**
+	* Checks whether the computer opponent has won
+	* @param array of char. Coordinates for the board.
+	* @param char of symbol. Symbol for opponent
+	* @return true or false whether the opponent has won
+	*/
+	private static boolean loseCondition(char[][] board, char symbol){
+		//top row filled in
+		if(board[0][0] == symbol && board[0][1] == symbol && board[0][2] == symbol){
+			return true;
+		}
+		//left column filled in
+		else if(board[0][0] == symbol && board[1][0] == symbol && board[2][0] == symbol){
+			return true;
+		}
+		//backslash diagonal filled in
+		else if(board[0][0] == symbol && board[1][1] == symbol && board[2][2] == symbol){
+			return true;
+		}
+		//forward slash diagonal filled in
+		else if(board[0][2] == symbol && board[1][1] == symbol && board[2][0] == symbol){
+			return true;
+		}
+		//middle column filled in
+		else if(board[0][1] == symbol && board[1][1] == symbol && board[2][1] == symbol){
+			return true;
+		}
+		//right column filled in
+		else if(board[0][2] == symbol && board[1][2] == symbol && board[2][2] == symbol){
+			return true;
+		}
+		//middle row filled in
+		else if(board[1][0] == symbol && board[1][1] == symbol && board[1][2] == symbol){
+			return true;
+		}
+		//bottom row filled in
+		else if(board[2][0] == symbol && board[2][1] == symbol && board[2][2] == symbol){
+			return true;
+		}
+		//otherwise return false
+		return false;
 	}	
 }
