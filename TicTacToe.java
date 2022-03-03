@@ -11,25 +11,51 @@ public class TicTacToe{
 		
 	public static void main(String[] args){
 		char[][] board = {{' ', ' ', ' '}, {' ', ' ', ' '}, {' ', ' ', ' '}}; // Create a 3 by 3 board
+		char[][] newBoard = {{' ', ' ', ' '}, {' ', ' ', ' '}, {' ', ' ', ' '}};
 		char playerSymbol = 'X'; // Player uses X in the game. 
 		char opponentSymbol = 'O'; // Opponent uses O in the game.
 		printBoard(board); // Print out the empty board using the printBoard method.
+		Scanner inputScanner = new Scanner(System.in);
 		
 		while(true){
-			playerTurn(board, playerSymbol); // Player(user) makes a choice using the plyaerTurn method.
+			playerTurn(board, playerSymbol); // Player(user) makes a choice using the playerTurn method.
 			if(winCondition(board, playerSymbol)){ //if player has won, win message will display before opponent's turn
-				System.out.println("You won");
+				
+				printBoard(board);
+				System.out.println("You won!");
+				System.out.println("Would you like to play again? Press 1, otherwise press 0");
+				System.out.println("\n");
+				int option = inputScanner.nextInt();
+				if(option == 0){
+					break;
+				}else if(option == 1){
+					printnewBoard(newBoard);
+				}
 				break;
 			}			
 			opponentTurn(board, opponentSymbol); // Opponent(computer) makes a choice using the opponentTurn method.
 			if(loseCondition(board, opponentSymbol)){ //if oppponent has won, lose message will display
-				System.out.println("You lose");
-				printBoard(board); //prints state of board with winning move
+				printBoard(board);//prints state of board with winning move
+				System.out.println("You lose!");
+				
+				System.out.println("Would you like to play again? Press 1, otherwise press 0");
+				System.out.println("\n");
 				break;
 			}
+			
+			if (playerSymbol + opponentSymbol == 9){
+				System.out.println("It's a Tie!");
+				System.out.println("Would you like to play again?");
+
+			}
+
+
+			
 			else{
 				printBoard(board); // Print out the board filled by player and opponent.
 			}
+				
+			
 		}
 	}
 
@@ -44,7 +70,17 @@ public class TicTacToe{
 		System.out.println("-+-+-");
 		System.out.println(board[2][0] + "|" + board[2][1] + "|" + board[2][2]);
 	}
-	
+	/**
+	* Draws a game board by aligining several characters as boundries.
+	* @param array of char. Coordinates for the board
+	*/
+	private static void printnewBoard(char[][] newBoard){
+		System.out.println(newBoard[0][0] + "|" + newBoard[0][1] + "|" + newBoard[0][2]);
+		System.out.println("-+-+-");
+		System.out.println(newBoard[1][0] + "|" + newBoard[1][1] + "|" + newBoard[1][2]);
+		System.out.println("-+-+-");
+		System.out.println(newBoard[2][0] + "|" + newBoard[2][1] + "|" + newBoard[2][2]);
+	}
 	/**
 	* Makes player's choice.
 	* @param array of char. Coordinates for the board.
@@ -54,7 +90,7 @@ public class TicTacToe{
 		int playerChoice;
 		Scanner output = new Scanner(System.in);
 		while(true){
-			System.out.println("Choose number 1 to 9"); 
+			System.out.println("Choose a number 1 to 9"); 
 			// Ask player's choice from 1 to 9, which corresponds to 9 positions of the board.
 			playerChoice = output.nextInt();
 			if(validMove(playerChoice, board)){ // Check whether the player's choice is valid (empty) using the validMove method.
@@ -208,4 +244,53 @@ public class TicTacToe{
 		//otherwise return false
 		return false;
 	}	
+
+
+
+
+	/**
+	 * @param array of char, the coordinates for the board
+	 * @param char of symbol, the symbol for the opponent
+	 * @return true of false whether there is a tie
+	 
+	private static boolean tieCondition(char[][] board, char symbol){ 
+		//top row filled in
+		if(board[0][0] == symbol && board[0][1] == symbol && board[0][2] == symbol){
+			return true;
+		}
+		//left column filled in
+		else if(board[0][0] == symbol && board[1][0] == symbol && board[2][0] == symbol){
+			return true;
+		}
+		//backslash diagonal filled in
+		else if(board[0][0] == symbol && board[1][1] == symbol && board[2][2] == symbol){
+			return true;
+		}
+		//forward slash diagonal filled in
+		else if(board[0][2] == symbol && board[1][1] == symbol && board[2][0] == symbol){
+			return true;
+		}
+		//middle column filled in
+		else if(board[0][1] == symbol && board[1][1] == symbol && board[2][1] == symbol){
+			return true;
+		}
+		//right column filled in
+		else if(board[0][2] == symbol && board[1][2] == symbol && board[2][2] == symbol){
+			return true;
+		}
+		//middle row filled in
+		else if(board[1][0] == symbol && board[1][1] == symbol && board[1][2] == symbol){
+			return true;
+		}
+		//bottom row filled in
+		else if(board[2][0] == symbol && board[2][1] == symbol && board[2][2] == symbol){
+			return true;
+		}
+		//otherwise return false
+		return false;
+	}
+	*/
+
+	
+
 }
