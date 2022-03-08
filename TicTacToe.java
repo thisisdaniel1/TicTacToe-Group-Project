@@ -11,12 +11,14 @@ public class TicTacToe{
 		
 	public static void main(String[] args){
 		char[][] board = {{' ', ' ', ' '}, {' ', ' ', ' '}, {' ', ' ', ' '}}; // Create a 3 by 3 board
-		char[][] newBoard = {{' ', ' ', ' '}, {' ', ' ', ' '}, {' ', ' ', ' '}};
+		//char[][] newBoard = {{' ', ' ', ' '}, {' ', ' ', ' '}, {' ', ' ', ' '}};
 		char playerSymbol = 'X'; // Player uses X in the game. 
 		char opponentSymbol = 'O'; // Opponent uses O in the game.
 		printBoard(board); // Print out the empty board using the printBoard method.
 		Scanner inputScanner = new Scanner(System.in);
+
 		
+			
 		while(true){
 			playerTurn(board, playerSymbol); // Player(user) makes a choice using the playerTurn method.
 			if(winCondition(board, playerSymbol)){ //if player has won, win message will display before opponent's turn
@@ -29,7 +31,7 @@ public class TicTacToe{
 				if(option == 0){
 					break;
 				}else if(option == 1){
-					printnewBoard(newBoard);
+					printBoard(board);
 				}
 				break;
 			}			
@@ -40,12 +42,20 @@ public class TicTacToe{
 				
 				System.out.println("Would you like to play again? Press 1, otherwise press 0");
 				System.out.println("\n");
+				int option = inputScanner.nextInt();
+				if(option == 0){
+					break;
+				}else if(option == 1){
+					printBoard(board);
+				}
 				break;
 			}
 			
-			if (playerSymbol + opponentSymbol == 9){
+			if (tieCondition(board)){
+				printBoard(board);
 				System.out.println("It's a Tie!");
 				System.out.println("Would you like to play again?");
+				break;
 
 			}
 
@@ -54,10 +64,13 @@ public class TicTacToe{
 			else{
 				printBoard(board); // Print out the board filled by player and opponent.
 			}
-				
+		}		
 			
-		}
+		
 	}
+	
+		
+		
 
 	/**
 	* Draws a game board by aligining several characters as boundries.
@@ -74,13 +87,14 @@ public class TicTacToe{
 	* Draws a game board by aligining several characters as boundries.
 	* @param array of char. Coordinates for the board
 	*/
-	private static void printnewBoard(char[][] newBoard){
+	/*private static void printnewBoard(char[][] newBoard){
 		System.out.println(newBoard[0][0] + "|" + newBoard[0][1] + "|" + newBoard[0][2]);
 		System.out.println("-+-+-");
 		System.out.println(newBoard[1][0] + "|" + newBoard[1][1] + "|" + newBoard[1][2]);
 		System.out.println("-+-+-");
 		System.out.println(newBoard[2][0] + "|" + newBoard[2][1] + "|" + newBoard[2][2]);
 	}
+	*/
 	/**
 	* Makes player's choice.
 	* @param array of char. Coordinates for the board.
@@ -245,7 +259,18 @@ public class TicTacToe{
 		return false;
 	}	
 
+	//check if the board is full
+	public static boolean tieCondition(char[][] board){
+		for(int i = 0; i < 3; i++){
+			for(int j= 0; j < 3; j++){
+				if (board[i][j] == ' '){
+					return false;
+				}
 
+			}
+		}
+		return true;
+	}
 
 
 	/**
