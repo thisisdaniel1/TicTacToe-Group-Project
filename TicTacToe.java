@@ -14,6 +14,7 @@ public class TicTacToe{
 		//char[][] newBoard = {{' ', ' ', ' '}, {' ', ' ', ' '}, {' ', ' ', ' '}};
 		char playerSymbol = 'X'; // Player uses X in the game. 
 		char opponentSymbol = 'O'; // Opponent uses O in the game.
+		int moveCounter = 0;
 		printBoard(board); // Print out the empty board using the printBoard method.
 		Scanner inputScanner = new Scanner(System.in);
 
@@ -34,6 +35,15 @@ public class TicTacToe{
 					printBoard(board);
 				}
 				break;
+			}
+			//when the player makes the fifth move, the game will result in a tie
+			moveCounter++;
+			if (moveCounter == 5){
+				System.out.println("It's a Tie!");
+				System.out.println("Would you like to play again?");
+				printBoard(board);
+				break;
+
 			}			
 			opponentTurn(board, opponentSymbol); // Opponent(computer) makes a choice using the opponentTurn method.
 			if(loseCondition(board, opponentSymbol)){ //if oppponent has won, lose message will display
@@ -51,6 +61,7 @@ public class TicTacToe{
 				break;
 			}
 			
+<<<<<<< HEAD
 			if (tieCondition(board)){
 				printBoard(board);
 				System.out.println("It's a Tie!");
@@ -61,6 +72,8 @@ public class TicTacToe{
 
 
 			
+=======
+>>>>>>> decda32c2d387a07ceff03f3c5def5c44d2e6c26
 			else{
 				printBoard(board); // Print out the board filled by player and opponent.
 			}
