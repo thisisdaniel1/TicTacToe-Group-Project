@@ -61,7 +61,7 @@ public class TicTacToe{
 				break;
 			}
 			
-<<<<<<< HEAD
+
 			if (tieCondition(board)){
 				printBoard(board);
 				System.out.println("It's a Tie!");
@@ -72,8 +72,7 @@ public class TicTacToe{
 
 
 			
-=======
->>>>>>> decda32c2d387a07ceff03f3c5def5c44d2e6c26
+
 			else{
 				printBoard(board); // Print out the board filled by player and opponent.
 			}
