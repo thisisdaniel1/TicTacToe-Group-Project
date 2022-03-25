@@ -18,7 +18,7 @@ public class TicTacToe{
 		printBoard(board); // Print out the empty board using the printBoard method.
 		Scanner inputScanner = new Scanner(System.in);
 
-		wee
+		
 			
 		while(true){
 			playerTurn(board, playerSymbol); // Player(user) makes a choice using the playerTurn method.
