@@ -6,6 +6,7 @@
 */
 
 import java.util.Scanner;
+import java.util.InputMismatchException;
 
 public class TicTacToe{
 		
@@ -15,12 +16,52 @@ public class TicTacToe{
 		char playerSymbol = 'X'; // Player uses X in the game. 
 		char opponentSymbol = 'O'; // Opponent uses O in the game.
 		int moveCounter = 0;
-		printBoard(board); // Print out the empty board using the printBoard method.
+		boolean replay;
+		
+		//printBoard(board); // Print out the empty board using the printBoard method.
 		Scanner inputScanner = new Scanner(System.in);
+					
+		do{
+			printBoard(board);
+			replay = true;
+			while(true){
+				try{
+					playerTurn(board, playerSymbol);	
+					if(gameOver(board, playerSymbol, opponentSymbol)){
+						break;				
+					}
+					opponentTurn(board, opponentSymbol);
+					printBoard(board);		
+				}
+				catch(InvalidInputException iie){
+					System.out.println(iie.getMessage());
+				}
+				catch(InputMismatchException ime){
+					System.out.println("input is not integer: " + ime);
+				}
+			}
+			
+			System.out.println("Would you like to play again? Press 1, otherwise press 0");
+			System.out.println("\n");
+			int option = inputScanner.nextInt();
+			if(option == 1){
+				replay = true;
+				for(int i = 0; i < board.length; i++){
+					for(int j = 0; j < board[i].length; j++){
+						board[i][j] = ' ';
+					}
+				}
+			}
+			if(option == 0){
+				System.out.println("Thanks for playing!");
+				replay = false;
+			}
+		}while(replay);
+	}
 
 		
 			
-		while(true){
+		/*while(true){
 			playerTurn(board, playerSymbol); // Player(user) makes a choice using the playerTurn method.
 			if(winCondition(board, playerSymbol)){ //if player has won, win message will display before opponent's turn
 				
@@ -80,7 +121,7 @@ public class TicTacToe{
 			
 		
 	}
-	
+	*/
 		
 		
 
@@ -112,7 +153,7 @@ public class TicTacToe{
 	* @param array of char. Coordinates for the board.
 	* @param char of symbol. Symbol for player.
 	*/
-	private static void playerTurn(char[][] board, char symbol){
+	private static void playerTurn(char[][] board, char symbol)throws InvalidInputException{
 		int playerChoice;
 		Scanner output = new Scanner(System.in);
 		while(true){
@@ -122,8 +163,8 @@ public class TicTacToe{
 			if(validMove(playerChoice, board)){ // Check whether the player's choice is valid (empty) using the validMove method.
 				break; // If it is valid, break the while loop.
 			}
-			else{System.out.println("Try different number"); // If it is not valid, prompt to choose different choice.
-			}
+			else{throw new InvalidInputException("Invalid input"); // Print out the exception for invalid input.
+			}			
 		}
 		move(playerChoice, board, symbol); // Place the player's choice in the board using the move method. 
 	}
@@ -270,7 +311,8 @@ public class TicTacToe{
 		//otherwise return false
 		return false;
 	}	
-
+	
+	/*
 	//check if the board is full
 	public static boolean tieCondition(char[][] board){
 		for(int i = 0; i < 3; i++){
@@ -283,7 +325,39 @@ public class TicTacToe{
 		}
 		return true;
 	}
-
+	*/
+	
+	/**
+	 * @param array of char, the coordinates for the board
+	 * @param char of symbol, the symbol for the player
+	 * @param char of symbol, the symbol for the opponent
+	 * @return true of false whether there the game is over
+	*/
+	private static boolean gameOver(char[][] board, char playerSymbol, char opponentSymbol){
+		if(winCondition(board, playerSymbol)){
+			printBoard(board);
+			System.out.println("You won!");
+			return true;
+		}
+					
+		if(loseCondition(board, opponentSymbol)){
+			printBoard(board);
+			System.out.println("You lose!");
+			return true;
+		}
+		
+		for(int i = 0; i < board.length; i++){
+			for(int j = 0; j < board[i].length; j++){
+				if(board[i][j] == ' '){
+					return false;
+				}
+			}
+		}
+		printBoard(board);
+		System.out.println("It's a Tie!");
+		return true;
+	}
+	
 
 	/**
 	 * @param array of char, the coordinates for the board
