@@ -25,10 +25,6 @@ public class Symbol{
 		if (pSymbol == 'X' || pSymbol == 'O'){
 			returnVal = true;
 		}
-		//else{
-		//	throw new InvalidInputException("Invalid input"); // Print out the exception for invalid input.
-		//	returnVal = false;
-		//}
 		return returnVal;
 	}
 		

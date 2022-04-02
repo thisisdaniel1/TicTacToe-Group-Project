@@ -1,12 +1,15 @@
 /**
 * This class models the Tic Tac Toe game.
 * @author Daniel K Nguyen, Sunghyun Nam, Callie Nicole Marshall
-* @version 1.1
+* @version 1.4
 * @since 3/1/2022
 */
 
 import java.util.Scanner;
 import java.util.InputMismatchException;
+import java.nio.file.Files;
+import java.nio.file.Paths;
+import java.io.*;
 
 public class TicTacToe{
 	private static char playerSymbol;
@@ -44,70 +47,21 @@ public class TicTacToe{
 		game.addOpponent(player.getOSymbol());
 		game.run();
 	}
-
-		
-			
-		/*while(true){
-			playerTurn(board, playerSymbol); // Player(user) makes a choice using the playerTurn method.
-			if(winCondition(board, playerSymbol)){ //if player has won, win message will display before opponent's turn
-				
-				printBoard(board);
-				System.out.println("You won!");
-				System.out.println("Would you like to play again? Press 1, otherwise press 0");
-				System.out.println("\n");
-				int option = inputScanner.nextInt();
-				if(option == 0){
-					break;
-				}else if(option == 1){
-					printBoard(board);
-				}
-				break;
-			}
-			//when the player makes the fifth move, the game will result in a tie
-			moveCounter++;
-			if (moveCounter == 5){
-				System.out.println("It's a Tie!");
-				System.out.println("Would you like to play again?");
-				printBoard(board);
-				break;
-
-			}			
-			opponentTurn(board, opponentSymbol); // Opponent(computer) makes a choice using the opponentTurn method.
-			if(loseCondition(board, opponentSymbol)){ //if oppponent has won, lose message will display
-				printBoard(board);//prints state of board with winning move
-				System.out.println("You lose!");
-				
-				System.out.println("Would you like to play again? Press 1, otherwise press 0");
-				System.out.println("\n");
-				int option = inputScanner.nextInt();
-				if(option == 0){
-					break;
-				}else if(option == 1){
-					printBoard(board);
-				}
-				break;
-			}
-			
-
-			if (tieCondition(board)){
-				printBoard(board);
-				System.out.println("It's a Tie!");
-				System.out.println("Would you like to play again?");
-				break;
-
-			}
-
-
-			
-
-			else{
-				printBoard(board); // Print out the board filled by player and opponent.
-			}
-		}		
-			
-		
+	public static void save() throws IOException{
+		ObjectOutputStream output = new ObjectOutputStream(Files.newOutputStream(Paths.get("SavedGame.dat")));
+		output.writeObject(game);
+		output.close();
 	}
-	*/
-		
+	public static void load() throws IOException{
+		try{
+			ObjectInputStream input = new ObjectInputStream(Files.newInputStream(Paths.get("SavedGame.dat")));
+			game = (Game) input.readObject();
+			input.close();
+			game.run();
+		}
+		catch(ClassNotFoundException classNotFound){
+			System.err.println("Invalid Object type");
+		}
+	}	
 }
 
