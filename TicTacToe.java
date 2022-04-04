@@ -13,9 +13,11 @@ import java.io.*;
 
 public class TicTacToe{
 	private static char playerSymbol;
+	private static char opponentSymbol;
 	private static Symbol player;
 	private static Game game;
-	
+	private static TUI tui;
+	private static WinCounter wins;
 	
 	public static void main(String[] args){
 		Scanner input = new Scanner(System.in);
@@ -40,28 +42,48 @@ public class TicTacToe{
 			}
 		}
 		
-		
+		opponentSymbol = player.getOSymbol();
 		game = new Game();
-		
+		System.out.println(game.getWinCounter());
+		wins = new WinCounter(game.getWinCounter());
+		System.out.println(wins.getWinCounter());		
+		game.setWins(wins);
+		//game.resetWinCounter(win.getWinCounter());
 		game.addPlayer(player.getPSymbol());
 		game.addOpponent(player.getOSymbol());
-		game.run();
+		
+		tui = new TUI(game, playerSymbol, opponentSymbol);
+		tui.run();
 	}
-	public static void save() throws IOException{
-		ObjectOutputStream output = new ObjectOutputStream(Files.newOutputStream(Paths.get("SavedGame.dat")));
-		output.writeObject(game);
+	public static void saveTUI() throws IOException{
+		ObjectOutputStream output = new ObjectOutputStream(Files.newOutputStream(Paths.get("SavedGameTUI.dat")));
+		output.writeObject(tui);
 		output.close();
 	}
-	public static void load() throws IOException{
+	public static void saveWins() throws IOException{
+		ObjectOutputStream output = new ObjectOutputStream(Files.newOutputStream(Paths.get("SavedGameWins.dat")));
+		output.writeObject(wins);
+		output.close();
+	}	
+	public static void loadTUI() throws IOException{
 		try{
-			ObjectInputStream input = new ObjectInputStream(Files.newInputStream(Paths.get("SavedGame.dat")));
-			game = (Game) input.readObject();
+			ObjectInputStream input = new ObjectInputStream(Files.newInputStream(Paths.get("SavedGameTUI.dat")));
+			tui = (TUI) input.readObject();
 			input.close();
-			game.run();
 		}
 		catch(ClassNotFoundException classNotFound){
 			System.err.println("Invalid Object type");
 		}
 	}	
+	public static void loadWins() throws IOException{
+		try{
+			ObjectInputStream input = new ObjectInputStream(Files.newInputStream(Paths.get("SavedGameWins.dat")));
+			wins = (WinCounter) input.readObject();
+			input.close();
+		}
+		catch(ClassNotFoundException classNotFound){
+			System.err.println("Invalid Object type");
+		}
+	}		
 }
 
