@@ -1,42 +1,44 @@
 import java.util.Scanner;
 import java.util.InputMismatchException;
-import java.util.NoSuchElementException;
-import java.io.*;
+import java.io.Serializable;
 
-
-public class Game implements Serializable{
+public class Game implements Serializable {
 	private char[][] board = {{' ', ' ', ' '}, {' ', ' ', ' '}, {' ', ' ', ' '}}; // Create a 3 by 3 board
 	private char playerSymbol; // Player uses X in the game. 
 	private char opponentSymbol; // Opponent uses O in the game.
 	private int moveCounter;
 	private boolean replay;
-	private int winCounter;
-	private WinCounter wins;
-	private int loseCounter;
-	private int tieCounter;	
 	private transient Scanner inputScanner;
-	
+	private Score score;
 	
 	public Game(){
 		this.playerSymbol =  ' ';
 		this.opponentSymbol =  ' ';
 		this.moveCounter = 0;
 		inputScanner = new Scanner(System.in);
+		score = new Score(0, 0);
 	}
 	
-	/*
 	public void run(){
+				
 		do{
 			printBoard(board);
+			cleanBoard(board);
 			replay = true;
 			while(true){
 				try{
-					playerTurn(board, playerSymbol);
-					if(gameOver(board, playerSymbol, opponentSymbol)){
-						break;
+					playerTurn(board, playerSymbol);	
+					if(gameOver(board, playerSymbol, opponentSymbol, score)){
+						System.out.println("Player : Opponent = " + score.getPScore() + " : " + score.getOScore());
+						break;				
 					}
 					opponentTurn(board, opponentSymbol);
-					printBoard(board);
+					if(gameOver(board, playerSymbol, opponentSymbol, score)){
+						System.out.println("Player : Opponent = " + score.getPScore() + " : " + score.getOScore());
+						break;				
+					}
+					
+					printBoard(board);		
 				}
 				catch(InvalidInputException iie){
 					System.out.println(iie.getMessage());
@@ -45,106 +47,69 @@ public class Game implements Serializable{
 					System.out.println("input is not integer: " + ime);
 				}
 			}
-			System.out.println("Press 1 to Play Again, 2 to Save, 3 to load, and 4 to quit");
+			
+			System.out.println("Enter 1 for CONTINUE, 0 for QUIT");
 			System.out.println("\n");
-			afterGame(inputScanner.nextInt());
+			int option = inputScanner.nextInt();
+			if(option == 1){
+				replay = true;
+				cleanBoard(board);
+			}
+								
+			if(option == 0){
+				System.out.println("Thanks for playing!");
+				replay = false;
+			}
 		}while(replay);
-	}
-	*/
-	/**
-	* Details various actions the player can take after a game
-	* @param option int to represent which option was chosen
-	**/
-	public void afterGame(int option){
-		if (option == 1){
-			replay = true;
-			clearBoard();
-		}
-		else if (option == 2){
-			try{
-				TicTacToe.saveTUI();
-				TicTacToe.saveWins();
-				clearBoard();
-			}
-			catch(IOException ioException){
-				System.err.println("Error inputing file. Try Again.");
-				System.err.printf("Exception Found: %s", ioException);
-			}
-			catch(NoSuchElementException nsee){
-				System.err.printf("Exception Found: %s", nsee);
-			}
-		}
-		else if (option == 3){
-			try{
-				System.out.println(winCounter);
-				TicTacToe.loadTUI();
-				TicTacToe.loadWins();
-				resetWinCounter(wins.getWinCounter());
-				
-				clearBoard();
-				System.out.println(winCounter);
-			}
-			catch(IOException ioException){
-				System.err.println("Error loading. Try Again.");
-				System.err.printf("Exception Found: %s", ioException);
-			}
-			catch(NoSuchElementException nsee){
-				System.err.printf("Exception Found: %s", nsee);
-			}
-		}
-		else if (option == 4){
-			System.out.println("Thanks for playing!");
-			replay = false;
-		}
-	}
+	}		
+	
+	
 	
 	/**
 	* Draws a game board by aligining several characters as boundries.
 	* @param array of char. Coordinates for the board
 	*/
-	public void printBoard(){
-		System.out.println("Wins: "+winCounter+" Loses: "+loseCounter+" Ties: "+tieCounter);
-		System.out.println("");
+	public static void printBoard(char[][] board){
 		System.out.println(board[0][0] + "|" + board[0][1] + "|" + board[0][2]);
 		System.out.println("-+-+-");
 		System.out.println(board[1][0] + "|" + board[1][1] + "|" + board[1][2]);
 		System.out.println("-+-+-");
 		System.out.println(board[2][0] + "|" + board[2][1] + "|" + board[2][2]);
-	}
+	}	
 	/**
 	* Makes player's choice.
 	* @param array of char. Coordinates for the board.
 	* @param char of symbol. Symbol for player.
 	*/
-	public void playerTurn(char symbol)throws InvalidInputException{
+	public static void playerTurn(char[][] board, char symbol)throws InvalidInputException{
 		int playerChoice;
 		Scanner output = new Scanner(System.in);
 		while(true){
 			System.out.println("Choose a number 1 to 9"); 
 			// Ask player's choice from 1 to 9, which corresponds to 9 positions of the board.
 			playerChoice = output.nextInt();
-			if(validMove(playerChoice)){ // Check whether the player's choice is valid (empty) using the validMove method.
+			if(validMove(playerChoice, board)){ // Check whether the player's choice is valid (empty) using the validMove method.
 				break; // If it is valid, break the while loop.
 			}
 			else{throw new InvalidInputException("Invalid input"); // Print out the exception for invalid input.
 			}
 		}
-		move(playerChoice, symbol); // Place the player's choice in the board using the move method. 
+		move(playerChoice, board, symbol); // Place the player's choice in the board using the move method. 
 	}
 	/**
 	* Makes opponent's choice. The computer choose the number by a random method.
 	* @param array of char. Coordinates for the board.
 	* @param char of symbol. Symbol for player.
 	*/
-	public void opponentTurn(char symbol){
+	public static void opponentTurn(char[][] board, char symbol){
 		int opponentChoice;
 		while(true){
 			opponentChoice = (int)(Math.random()*9 + 1); // Use Math.random method, 0-8 then 1-9
-		    if(validMove(opponentChoice)){ // Check whether the opponent's choice is valid (empty) using the validMove method.
+		    if(validMove(opponentChoice, board)){ // Check whether the opponent's choice is valid (empty) using the validMove method.
 				break;
 			}
 		}
-		move(opponentChoice, symbol); // Place the opponent's choice in the board using the move method.
+		move(opponentChoice, board, symbol); // Place the opponent's choice in the board using the move method.
 	}
 	/**
 	* Places the symbol in the board following the number chosen.
@@ -152,7 +117,7 @@ public class Game implements Serializable{
 	* @param array of char. Coordinates for the board.
 	* @param char of symbol. Symbol for player.
 	*/
-	public void move(int choice, char symbol){
+	public static void move(int choice, char[][] board, char symbol){
 		switch(choice){
 			case 1: board[0][0] = symbol; break; // If 1 is chosen, put the symbol in the first slot.
 			case 2: board[0][1] = symbol; break;
@@ -172,7 +137,7 @@ public class Game implements Serializable{
 	* @param array of char. Coordinates for the board.
 	* @return true or false regarding the validity of the slot.
 	*/
-	public boolean validMove(int choice){
+	public static boolean validMove(int choice, char[][] board){
 		switch(choice){
 			case 1: return(board[0][0] == ' '); // if 1 is chosen and the first slot is empty, then return true.
 			case 2: return(board[0][1] == ' ');
@@ -180,20 +145,20 @@ public class Game implements Serializable{
 			case 4: return(board[1][0] == ' ');
 			case 5: return(board[1][1] == ' ');				
 			case 6: return(board[1][2] == ' ');	
-			case 7: return(board[2][0] == ' ');
+			case 7: return(board[2][0] == ' ');					
 			case 8: return(board[2][1] == ' ');
 			case 9: return(board[2][2] == ' ');
 			default: return false;
 		}
 	}
-
+	
 	/**
 	* Checks whether you have won with three in a row
 	* @param array of char. Coordinates for the board.
 	* @param char of symbol. Symbol for player
 	* @return true or false whether the player has won
 	*/
-	public boolean winCondition(char symbol){
+	public static boolean winCondition(char[][] board, char symbol){
 		//top row filled in
 		if(board[0][0] == symbol && board[0][1] == symbol && board[0][2] == symbol){
 			return true;
@@ -236,7 +201,7 @@ public class Game implements Serializable{
 	* @param char of symbol. Symbol for opponent
 	* @return true or false whether the opponent has won
 	*/
-	public boolean loseCondition(char symbol){
+	public static boolean loseCondition(char[][] board, char symbol){
 		//top row filled in
 		if(board[0][0] == symbol && board[0][1] == symbol && board[0][2] == symbol){
 			return true;
@@ -271,7 +236,22 @@ public class Game implements Serializable{
 		}
 		//otherwise return false
 		return false;
+	}	
+	
+	/*
+	//check if the board is full
+	public static boolean tieCondition(char[][] board){
+		for(int i = 0; i < 3; i++){
+			for(int j= 0; j < 3; j++){
+				if (board[i][j] == ' '){
+					return false;
+				}
+
+			}
+		}
+		return true;
 	}
+	*/
 	
 	/**
 	 * @param array of char, the coordinates for the board
@@ -279,19 +259,18 @@ public class Game implements Serializable{
 	 * @param char of symbol, the symbol for the opponent
 	 * @return true of false whether there the game is over
 	*/
-	public boolean gameOver(char playerSymbol, char opponentSymbol){
-		if(winCondition(playerSymbol)){
-			printBoard();
-			winCounter++;
-			wins.setWinCounter(winCounter);
+	public static boolean gameOver(char[][] board, char playerSymbol, char opponentSymbol, Score score){
+		if(winCondition(board, playerSymbol)){
+			printBoard(board);
 			System.out.println("You won!");
+			score.setPScore();
 			return true;
 		}
-		
-		if(loseCondition(opponentSymbol)){
-			printBoard();
-			loseCounter++;
+					
+		if(loseCondition(board, opponentSymbol)){
+			printBoard(board);
 			System.out.println("You lose!");
+			score.setOScore();
 			return true;
 		}
 		
@@ -302,87 +281,25 @@ public class Game implements Serializable{
 				}
 			}
 		}
-		printBoard();
-		tieCounter++;
+		printBoard(board);
 		System.out.println("It's a Tie!");
 		return true;
 	}
-	/**
-	* Method to clear board by setting everything to white space
-	**/
-	public void clearBoard(){
-		for (int i = 0; i < board.length; i++){
-			for (int j = 0; j < board[i].length; j++){
+	
+	public void addPlayer(char player){
+		this.playerSymbol = player;
+	}
+	
+	public void addOpponent(char opponent){
+		this.opponentSymbol = opponent;
+	}
+	
+	public static void cleanBoard(char[][] board){
+		for(int i = 0; i < board.length; i++){
+			for(int j = 0; j < board[i].length; j++){
 				board[i][j] = ' ';
 			}
 		}
 	}
-	/**
-	 * Assigns a char as playerSymbol
-	 * @param char of player symbol
-	**/
-	public void addPlayer(char player){
-		this.playerSymbol = player;
-	}
-	/**
-	 * Assigns a char as opponent symbol
-	 * @param char of opponent
-	**/
-	public void addOpponent(char opponent){
-		this.opponentSymbol = opponent;
-	}
-	/**
-	* Sets winCounter to save
-	* @param int winCounter of save game
-	**/
-	public void setWinCounter(int wins){
-		this.winCounter = wins;
-	}
-	public void setWins(WinCounter win){
-		this.wins = win;
-	}
-	public void resetWinCounter(int win){
-		this.winCounter = win;
-	}
-	/**
-	*
-	*
-	**/
-	public int getWinCounter(){
-		return this.winCounter;
-	}
-	public int getLoseCounter(){
-		return this.loseCounter;
-	}
-	public int getTieCounter(){
-		return this.tieCounter;
-	}
-	public int getOpponentSymbol(){
-		return this.opponentSymbol;
-	}
-	public int getPlayerSymbol(){
-		return this.playerSymbol;
-	}
-	public char[][] getBoard(){
-		return this.board;
-	}
-	/**
-	*
-	*
-	**/
-	public void setLoseCounter(int loses){
-		this.loseCounter = loses;
-	}
-	/**
-	*
-	*
-	**/
-	public void setTieCounter(int ties){
-		this.tieCounter = ties;
-	}
-	/*
-	public void addWinsCounter(WinCounter wins){
-		this.wins = wins;
-	}
-	*/
+	
 }
