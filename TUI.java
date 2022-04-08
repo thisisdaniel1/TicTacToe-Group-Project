@@ -42,4 +42,7 @@ public class TUI implements Serializable{
 			game.afterGame(inputScanner.nextInt());
 		}while(replay);
 	}
+	public void setReplay(boolean val){
+		replay = val;
+	}
 }
