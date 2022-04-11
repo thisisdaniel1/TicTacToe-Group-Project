@@ -1,141 +1,74 @@
 /**
 * This class models the Tic Tac Toe game.
 * @author Daniel K Nguyen, Sunghyun Nam, Callie Nicole Marshall
-* @version 1.4
+* @version 1.1
 * @since 3/1/2022
 */
-
 import java.util.Scanner;
 import java.util.InputMismatchException;
-import java.nio.file.Files;
-import java.nio.file.Paths;
-import java.io.*;
 
-public class TicTacToe{
+public class TicTacToe {
 	private static char playerSymbol;
 	private static char opponentSymbol;
-	private static Symbol player;
 	private static Game game;
-	private static TUI tui;
-	private static WinCounter wins;
-	private static LoseCounter losses;
-	private static TieCounter ties;
+	private static Scanner input;
+	
 	
 	public static void main(String[] args){
-		Scanner input = new Scanner(System.in);
+		input = new Scanner(System.in);
 		
-
-		while(true){
-			try{
-				System.out.println("What character do you want: X or O");
-				String inputChar = input.next();
-				playerSymbol = inputChar.charAt(0);
-				player = new Symbol(playerSymbol);
-				if (player.validSymbol()){
-					player.setOSymbol(playerSymbol);
-					break;
+		System.out.println("Press 1 for NEW GAME, 0 for LOAD");
+		System.out.println("\n");
+		int option = input.nextInt();
+		if(option == 1){
+			while(true){
+				try{
+					System.out.println("What character do you want: X or O");
+					String inputChar = input.next();
+					playerSymbol = inputChar.charAt(0);
+					if (playerSymbol == 'X'){
+						opponentSymbol = 'O';
+						break;
+					}
+					else{
+						opponentSymbol = 'X';
+						break;
+					}
+				}
+				catch(InputMismatchException ime){
+					System.out.println("input is not integer: " + ime);
 				}
 			}
-			catch(InvalidInputException iie){
-				System.out.println(iie.getMessage());
-			}
-			catch(InputMismatchException ime){
-				System.out.println("input is not integer: " + ime);
-			}
+			//creates a new game object with the playerSymbol and opponentSymbol
+			game = new Game(playerSymbol,opponentSymbol);
+			//run the run method in the game class to run the game
+			game.run();
+			saveContinue();
 		}
-		
-		opponentSymbol = player.getOSymbol();
-		char[][] board = {{' ', ' ', ' '}, {' ', ' ', ' '}, {' ', ' ', ' '}};
-		game = new Game(board);
-		wins = new WinCounter(game.getWinCounter());
-		losses = new LoseCounter(game.getLoseCounter());
-		ties = new TieCounter(game.getTieCounter());
-		game.setWins(wins); game.setLosses(losses); game.setTies(ties);
-		game.addPlayer(player.getPSymbol());
-		game.addOpponent(player.getOSymbol());
-		
-		tui = new TUI(game, playerSymbol, opponentSymbol);
-		game.setTUI(tui);
-		tui.run();
-	}
-	public static void saveTUI() throws IOException{
-		ObjectOutputStream output = new ObjectOutputStream(Files.newOutputStream(Paths.get("SavedGameTUI.dat")));
-		output.writeObject(tui);
-		output.close();
-	}
-	public static void saveWins() throws IOException{
-		ObjectOutputStream output = new ObjectOutputStream(Files.newOutputStream(Paths.get("SavedGameWins.dat")));
-		output.writeObject(wins);
-		output.close();
-	}
-	public static void saveLosses() throws IOException{
-		ObjectOutputStream output = new ObjectOutputStream(Files.newOutputStream(Paths.get("SavedGameLosses.dat")));
-		output.writeObject(losses);
-		output.close();
-	}
-	public static void saveTies() throws IOException{
-		ObjectOutputStream output = new ObjectOutputStream(Files.newOutputStream(Paths.get("SavedGameTies.dat")));
-		output.writeObject(ties);
-		output.close();
-	}
-	public static void loadTUI() throws IOException{
-		try{
-			ObjectInputStream input = new ObjectInputStream(Files.newInputStream(Paths.get("SavedGameTUI.dat")));
-			tui = (TUI) input.readObject();
-			input.close();
-		}
-		catch(ClassNotFoundException classNotFound){
-			System.err.println("Invalid Object type");
-		}
-	}	
-	public static void loadWins() throws IOException{
-		try{
-			ObjectInputStream input = new ObjectInputStream(Files.newInputStream(Paths.get("SavedGameWins.dat")));
-			wins = (WinCounter) input.readObject();
-			input.close();
-			if (wins.getCounter() <= 1){
-				game.setWinCounter(wins.getCounter());
-			}
-			else{game.setWinCounter(wins.getCounter()-1);
-			}
-			wins = null;
-		}
-		catch(ClassNotFoundException classNotFound){
-			System.err.println("Invalid Object type");
+		if(option == 0){
+			//sets the game object as the object from the SavedGame.dat file
+			game = Serializer.deserializeGame();
+			//calls the run method of the deserialized Game
+			game.run();
+			saveContinue();
 		}
 	}
-	public static void loadLosses() throws IOException{
-		try{
-			ObjectInputStream input = new ObjectInputStream(Files.newInputStream(Paths.get("SavedGameLosses.dat")));
-			losses = (LoseCounter) input.readObject();
-			input.close();
-			if (losses.getCounter() <= 1){
-				game.setLoseCounter(losses.getCounter());
-			}
-			else{game.setLoseCounter(losses.getCounter()-1);
-			}
-			losses = null;
+	/**
+	* Asks the player whether they want to save or continue playing. If player chooses to save, it will call the serializeGame method from the state game object.
+	* @since 4/11/22
+	*
+	**/
+	public static void saveContinue(){
+		System.out.println("Enter 1 for SAVE, 0 otherwise");
+		System.out.println("\n");
+		int option = input.nextInt();
+		if(option == 1){
+			//press 1 to save the game by serialization
+			Serializer.serializeGame(game);
 		}
-		catch(ClassNotFoundException classNotFound){
-			System.err.println("Invalid Object type");
-		}
-	}
-	public static void loadTies() throws IOException{
-		try{
-			ObjectInputStream input = new ObjectInputStream(Files.newInputStream(Paths.get("SavedGameTies.dat")));
-			ties = (TieCounter) input.readObject();
-			input.close();
-			int tieCounter = ties.getCounter();
-			if (tieCounter <= 1){
-				game.setTieCounter(tieCounter);
-			}
-			else{
-				game.setTieCounter(tieCounter--);
-			}
-			ties = null;
-		}
-		catch(ClassNotFoundException classNotFound){
-			System.err.println("Invalid Object type");
+		if(option == 0){
+			//return functions much in the same way as break and breaks the while loop
+			return;
 		}
 	}
 }
